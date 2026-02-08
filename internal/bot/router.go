@@ -74,23 +74,34 @@ func RegisterHandlers(b *tele.Bot, cfg *config.Config, watchdog *system.Watchdog
 		return c.Send(fmt.Sprintf("📝 *Output:*\n```\n%s\n```", output), tele.ModeMarkdown)
 	})
 
-	// Reboot system handler with simple confirmation
-	b.Handle("/reboot", func(c tele.Context) error {
-		return c.Send("⚠️ *System Reboot Confirmation*\n\nAre you sure you want to reboot the system? This will disconnect all active sessions.\n\nType `YES` to confirm or anything else to cancel.", tele.ModeMarkdown)
-	})
+	// Create inline keyboard markup
+	markup := &tele.ReplyMarkup{}
 
-	// Handle reboot confirmation text
-	b.Handle(tele.OnText, func(c tele.Context) error {
-		if strings.ToUpper(c.Text()) == "YES" {
-			// Check if this is in response to reboot command
-			// For simplicity, we'll assume any "YES" means reboot confirmation
-			result, err := system.RebootSystem()
-			if err != nil {
-				return c.Send(result, tele.ModeMarkdown)
-			}
+	// Define inline buttons for reboot confirmation using markup helpers
+	rebootConfirmBtn := markup.Data("✅ YES - Reboot System", "reboot_confirm", "confirm")
+	rebootCancelBtn := markup.Data("❌ NO - Cancel", "reboot_cancel", "cancel")
+
+	// Register button callback handlers
+	b.Handle(&rebootConfirmBtn, func(c tele.Context) error {
+		result, err := system.RebootSystem()
+		if err != nil {
 			return c.Send(result, tele.ModeMarkdown)
 		}
-		return nil // Ignore other text messages
+		return c.Send(result, tele.ModeMarkdown)
+	})
+
+	b.Handle(&rebootCancelBtn, func(c tele.Context) error {
+		return c.Send("❌ Reboot cancelled.", tele.ModeMarkdown)
+	})
+
+	// Reboot system handler with inline buttons
+	b.Handle("/reboot", func(c tele.Context) error {
+		markup.Inline(
+			markup.Row(rebootConfirmBtn),
+			markup.Row(rebootCancelBtn),
+		)
+
+		return c.Send("⚠️ *System Reboot Confirmation*\n\nAre you sure you want to reboot the system? This will disconnect all active sessions.", tele.ModeMarkdown, markup)
 	})
 
 	// Restart service handler
