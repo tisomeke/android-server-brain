@@ -133,6 +133,8 @@ The uninstall script will:
 * `/restart <service>` - Restart system services
   - Usage: `/restart ssh` or `/restart nginx`
   - Use `/restart` without arguments to see available services
+* `/update` - Check for and install ASB updates
+  - Usage: `/update` to check for updates, `/update now` to install
 
 **Remote Execution:**
 * `/exec <command>` - Execute shell commands remotely
@@ -169,6 +171,10 @@ The uninstall script will:
 # 1. Send script file to bot
 # 2. Script automatically becomes executable
 # 3. Run: /exec ~/server/myscript.sh
+
+# Check for and install updates
+/update
+/update now
 ```
 
 ### 🎮 Advanced Usage Examples

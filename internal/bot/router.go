@@ -121,4 +121,78 @@ func RegisterHandlers(b *tele.Bot, cfg *config.Config, watchdog *system.Watchdog
 
 		return c.Send(result, tele.ModeMarkdown)
 	})
+
+	// Update system handler
+	b.Handle("/update", func(c tele.Context) error {
+		args := c.Args()
+
+		// If no arguments, check for updates
+		if len(args) == 0 {
+			c.Send("🔍 Checking for updates...", tele.ModeMarkdown)
+
+			result, err := system.CheckForUpdates()
+			if err != nil {
+				return c.Send(fmt.Sprintf("❌ Error checking for updates: %v", err), tele.ModeMarkdown)
+			}
+
+			if !result.Success {
+				return c.Send(result.Message, tele.ModeMarkdown)
+			}
+
+			// If updates are available, show update options
+			if result.NewVersion != "" {
+				message := fmt.Sprintf(
+					"%s\n\n"+
+						"*Current version:* `%s`\n"+
+						"*Available version:* `%s`\n\n"+
+						"Use `/update now` to install updates",
+					result.Message,
+					strings.TrimSpace(result.OldVersion),
+					strings.TrimSpace(result.NewVersion),
+				)
+				return c.Send(message, tele.ModeMarkdown)
+			}
+
+			return c.Send(result.Message, tele.ModeMarkdown)
+		}
+
+		// If argument is "now", perform update
+		if args[0] == "now" {
+			c.Send("🔄 Starting update process...", tele.ModeMarkdown)
+
+			// Perform update
+			result, err := system.PerformUpdate()
+			if err != nil {
+				return c.Send(fmt.Sprintf("❌ Update failed: %v", err), tele.ModeMarkdown)
+			}
+
+			if !result.Success {
+				return c.Send(result.Message, tele.ModeMarkdown)
+			}
+
+			// Show success message
+			message := fmt.Sprintf(
+				"%s\n\n"+
+					"*Updated to version:* `%s`\n"+
+					"Backup created at: `%s`\n\n"+
+					"Restarting ASB service now...",
+				result.Message,
+				strings.TrimSpace(result.NewVersion),
+				result.BackupPath,
+			)
+
+			c.Send(message, tele.ModeMarkdown)
+
+			// Restart ASB service
+			restartMsg, restartErr := system.RestartASB()
+			if restartErr != nil {
+				return c.Send(fmt.Sprintf("⚠️ %s\n\n%s", restartMsg, "Manual restart may be required."), tele.ModeMarkdown)
+			}
+
+			return c.Send(fmt.Sprintf("✅ %s", restartMsg), tele.ModeMarkdown)
+		}
+
+		// Invalid argument
+		return c.Send("Usage:\n• `/update` - Check for updates\n• `/update now` - Install available updates", tele.ModeMarkdown)
+	})
 }
