@@ -2,12 +2,12 @@ package main
 
 import (
 	"log"
-	"os"
 	"os/exec"
 	"time"
 
 	"android-server-brain/config"
 	"android-server-brain/internal/bot"
+	"android-server-brain/internal/system"
 
 	tele "gopkg.in/telebot.v3"
 )
@@ -42,11 +42,14 @@ func main() {
 		}
 	})
 
+	// Start watchdog for battery monitoring
+	watchdog := system.NewWatchdog(b, cfg, 10*time.Minute)
+	watchdog.Start()
+
 	// Setup routes
-	bot.RegisterHandlers(b, cfg)
+	bot.RegisterHandlers(b, cfg, watchdog)
 
 	log.Printf("ASB Started: Admin ID %d", cfg.AdminID)
+	log.Printf("Watchdog monitoring started with 10-minute intervals")
 	b.Start()
 }
-
-
