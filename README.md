@@ -2,6 +2,15 @@
 
 **Turn your Android smartphone into a powerful, Telegram-managed autonomous server.**
 
+> [!WARNING]
+> **Known Issues Requiring Attention:**
+> - Go 1.25.7 toolchain problems on Android/arm64 (use Go 1.21.x instead)
+> - DNS resolution issues in Termux environment
+> - Binary execution problems on some Android devices
+> - Termux:Boot detection sensitivity
+> 
+> These issues are being actively worked on. See workaround solutions in documentation.
+
 > [!TIP]
 > [🇷🇺 *Читать на русском*](README.ru.md)
 
