@@ -6,24 +6,33 @@ import (
 	"strings"
 )
 
+// GetSystemStatus collects data from Termux and OS
 func GetSystemStatus() string {
-	// getting access to battery level with termux-api
-	battery, _ := exec.Command("termux-battery-status").Output()
-	
-	// accessing available free space
-	df, _ := exec.Command("sh", "-c", "df -h /data | tail -1 | awk '{print $4}'").Output()
-	
-	// accessing uptime
-	uptime, _ := exec.Command("uptime", "-p").Output()
+	// Battery info from termux-api
+	battery, err := exec.Command("termux-battery-status").Output()
+	if err != nil {
+		battery = []byte("Unavailable (API missing)")
+	}
 
-	status := fmt.Sprintf(
-		"📊 **ASB Status**\n\n"+
-		"🔋 Battery: %s\n"+
-		"💾 Free Space: %s\n"+
-		"⏱ Uptime: %s",
-		string(battery),
+	// Storage info for the data partition
+	df, err := exec.Command("sh", "-c", "df -h /data | tail -1 | awk '{print $4}'").Output()
+	if err != nil {
+		df = []byte("N/A")
+	}
+
+	// Uptime info
+	uptime, err := exec.Command("uptime", "-p").Output()
+	if err != nil {
+		uptime = []byte("N/A")
+	}
+
+	return fmt.Sprintf(
+		"📊 *System Status*\n\n"+
+			"🔋 *Battery:* %s\n"+
+			"💾 *Free Space:* %s\n"+
+			"⏱ *Uptime:* %s",
+		strings.TrimSpace(string(battery)),
 		strings.TrimSpace(string(df)),
 		strings.TrimSpace(string(uptime)),
 	)
-	return status
 }
