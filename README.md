@@ -1,2 +1,4 @@
-# android-server-brain
-A Telegram bot written in GO to monitor and fully control your android server
+# ANDROID-SERVER-BRAIN (ASB)
+
+*[прочитать на русском](README.ru.md)*
+
