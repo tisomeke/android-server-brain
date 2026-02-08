@@ -42,6 +42,7 @@ confirm_removal() {
     echo -e "${YELLOW}  • Storage directories${NC}"
     echo -e "${YELLOW}  • Auto-start scripts${NC}"
     echo -e "${YELLOW}  • Log files${NC}"
+    echo -e "${YELLOW}  • Installation directory (optional)${NC}"
     echo
     read -p "Are you sure you want to proceed? (y/N): " -n 1 -r
     echo
@@ -150,10 +151,38 @@ else
     print_warning "Storage directory preserved"
 fi
 
-print_step "5" "Final cleanup"
-# Remove any temporary files
-find . -name "*.tmp" -delete 2>/dev/null
-find . -name "*~" -delete 2>/dev/null
+print_step "5" "Removing installation directory"
+# Ask about removing the installation directory itself
+INSTALL_DIR=$(pwd)
+BASENAME=$(basename "$INSTALL_DIR")
+
+if [ "$BASENAME" = "android-server-brain" ]; then
+    echo
+    echo -e "${YELLOW}Installation directory: $INSTALL_DIR${NC}"
+    read -p "Remove the entire ASB installation directory? (y/N): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        # Change to parent directory to avoid "directory not empty" issues
+        cd ..
+        if [ -d "$INSTALL_DIR" ]; then
+            rm -rf "$INSTALL_DIR"
+            print_success "Removed installation directory: $INSTALL_DIR"
+        fi
+        # Stay in parent directory since original directory is gone
+    else
+        print_warning "Installation directory preserved"
+        # Remove any temporary files in current directory
+        find . -name "*.tmp" -delete 2>/dev/null
+        find . -name "*~" -delete 2>/dev/null
+    fi
+else
+    print_warning "Not in expected directory structure, skipping directory removal"
+    # Remove temporary files
+    find . -name "*.tmp" -delete 2>/dev/null
+    find . -name "*~" -delete 2>/dev/null
+fi
+
+print_step "6" "Final cleanup"
 
 print_header
 echo -e "${GREEN}🎉 ASB Removal Complete!${NC}"
@@ -166,6 +195,10 @@ echo -e "  • Log files"
 echo -e "  • Symbolic links"
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo -e "  • Uploaded files and scripts"
+    # Check if installation directory was also removed
+    if [ -n "$REMOVE_INSTALL_DIR" ] && [ "$REMOVE_INSTALL_DIR" = "y" ]; then
+        echo -e "  • Installation directory"
+    fi
 fi
 echo
 echo -e "${YELLOW}Manual cleanup (if needed):${NC}"
