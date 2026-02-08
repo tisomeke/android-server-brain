@@ -46,13 +46,33 @@ print_header
 echo -e "${CYAN}🚀 Starting automated ASB installation...${NC}"
 echo
 
-print_step "1" "Checking prerequisites and requesting storage access"
+print_step "1" "Verifying system dependencies and environment"
 
 # Check if running in Termux
 if [ ! -d "/data/data/com.termux" ]; then
     print_error "This script must be run in Termux environment"
     exit 1
 fi
+
+# Check for Termux:Boot installation and first run
+print_warning "Checking Termux:Boot status..."
+if [ ! -d "$HOME/.termux/boot" ]; then
+    print_error "Termux:Boot has never been run!"
+    echo -e "${YELLOW}Please follow these steps:${NC}"
+    echo -e "${YELLOW}1. Install Termux:Boot from F-Droid${NC}"
+    echo -e "${YELLOW}2. Open the Termux:Boot app once${NC}"
+    echo -e "${YELLOW}3. Grant any requested permissions${NC}"
+    echo -e "${YELLOW}4. Run this installer again${NC}"
+    exit 1
+fi
+print_success "Termux:Boot verified"
+
+# Check for essential system commands
+print_warning "Verifying system commands..."
+check_command "pkg"
+check_command "curl"
+check_command "ping"
+print_success "System commands verified"
 
 # Check/Request Storage Access
 if [ ! -d "$HOME/storage" ]; then
@@ -171,30 +191,52 @@ else
     exit 1
 fi
 
-print_step "7" "Setting up auto-start service"
+print_step "7" "Setting up enhanced auto-start service"
 
-# Setup Termux:Boot auto-start
+# Setup Termux:Boot auto-start with enhanced reliability
 BOOT_SCRIPT_DIR="$HOME/.termux/boot"
 BOOT_SCRIPT="$BOOT_SCRIPT_DIR/asb"
 
 mkdir -p "$BOOT_SCRIPT_DIR"
 
+# Create enhanced boot script with better error handling
 cat <<'EOF' > "$BOOT_SCRIPT"
 #!/data/data/com.termux/files/usr/bin/sh
 
-cd "$HOME/android-server-brain" || exit 1
+# Enhanced ASB Auto-start Script
+LOG_FILE="$HOME/android-server-brain/asb-boot.log"
+echo "[$(date)] Starting ASB auto-start sequence" >> "$LOG_FILE"
 
-# Wait for network connectivity
-until ping -c1 google.com &>/dev/null; do
+cd "$HOME/android-server-brain" || {
+    echo "[$(date)] ERROR: Cannot cd to android-server-brain directory" >> "$LOG_FILE"
+    exit 1
+}
+
+echo "[$(date)] Waiting for network connectivity..." >> "$LOG_FILE"
+# Wait for network connectivity with timeout
+COUNT=0
+while ! ping -c1 8.8.8.8 &>/dev/null; do
+    COUNT=$((COUNT + 1))
+    if [ $COUNT -gt 60 ]; then
+        echo "[$(date)] ERROR: Network timeout after 5 minutes" >> "$LOG_FILE"
+        exit 1
+    fi
     sleep 5
 done
+echo "[$(date)] Network connectivity established" >> "$LOG_FILE"
 
-# Start ASB in background
+# Additional delay to ensure system is fully ready
+sleep 10
+
+echo "[$(date)] Starting ASB service..." >> "$LOG_FILE"
+# Start ASB with proper process management
 nohup ./asb > asb.log 2>&1 &
+ASB_PID=$!
+echo "[$(date)] ASB started with PID: $ASB_PID" >> "$LOG_FILE"
 EOF
 
 chmod +x "$BOOT_SCRIPT"
-print_success "Auto-start service configured"
+print_success "Enhanced auto-start service configured"
 
 # Final summary
 print_header
@@ -204,14 +246,18 @@ echo -e "${CYAN}Summary:${NC}"
 echo -e "  • Binary: $(pwd)/asb"
 echo -e "  • Config: $(pwd)/config.json"
 echo -e "  • Storage: ~/server -> $STORAGE_DIR"
-echo -e "  • Logs: $(pwd)/asb.log"
+echo -e "  • Main Log: $(pwd)/asb.log"
+echo -e "  • Boot Log: $(pwd)/asb-boot.log"
 echo -e "  • Auto-start: $BOOT_SCRIPT"
 echo
 echo -e "${YELLOW}Next steps:${NC}"
-echo -e "  1. Make sure Termux:Boot app is installed from F-Droid"
-echo -e "  2. Grant Termux:Boot permission in Android settings"
-echo -e "  3. Restart your device to test auto-start"
+echo -e "  1. Grant Termux:Boot permission in Android settings"
+echo -e "  2. Restart your device to test auto-start"
+echo -e "  3. Check boot log: cat asb-boot.log"
 echo -e "  4. Or run manually: ./asb"
+echo
+echo -e "${GREEN}💡 Pro tip: The enhanced auto-start includes network detection${NC}"
+echo -e "${GREEN}   and detailed logging for troubleshooting${NC}"
 echo
 echo -e "${GREEN}Need help? Check README.md for detailed usage instructions${NC}"
 echo
