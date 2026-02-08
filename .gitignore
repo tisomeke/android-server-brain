@@ -1,0 +1,87 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (shouldn't be in version control)
+vendor/
+
+# Go workspace file
+go.work
+
+# ASB specific binaries
+asb
+asb.exe
+
+# Configuration files (may contain sensitive data)
+config.json
+
+# Log files
+*.log
+logs/
+
+# Backup files created by update system
+backup_*/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Termux specific
+.termux/
+
+# Downloaded files directory
+downloads/
+server/
+
+# Build artifacts
+bin/
+dist/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Android/Termux environment files
+/storage/
+/home/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Coverage output
+coverage.*
+*.cover
+*.html
+
+# Benchmark output
+bench.out
+
+# Docker
+docker-compose.override.yml
+
+# GitHub
+.github/
