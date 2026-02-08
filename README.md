@@ -122,11 +122,24 @@ The uninstall script will:
 
 #### Telegram Commands:
 
+**Basic Commands:**
 * `/start` - Welcome message and basic info
 * `/status` - View system health (battery, storage, uptime)
-* `/battery` - Check detailed battery status
-* `/watchdog` - View watchdog monitoring status
+* `/battery` - Check detailed battery status (charge %, temperature, charging status)
+* `/watchdog` - View watchdog monitoring status and configuration
+
+**Remote Execution:**
 * `/exec <command>` - Execute shell commands remotely
+  - Example: `/exec ps aux` or `/exec df -h`
+  - Commands run with Termux user privileges
+  - Includes timeout protection
+
+**File Management:**
+* **Upload files** - Simply send any file to the bot
+  - Files are automatically saved to `~/downloads/server`
+  - Symlinked to `~/server` with executable permissions (`chmod +x`)
+  - Access via `~/server/filename` or direct path
+  - Can be executed directly after upload
 
 #### File Management:
 
