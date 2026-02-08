@@ -66,7 +66,13 @@ if [ ! -d "$HOME/storage" ]; then
 fi
 print_success "Storage access confirmed"
 
-print_step "2" "Installing system dependencies"
+print_step "2" "Making scripts executable"
+
+# Make all .sh files executable
+find . -name "*.sh" -exec chmod +x {} \;
+print_success "All shell scripts made executable"
+
+print_step "3" "Installing system dependencies"
 
 # Update package lists
 print_warning "Updating package lists..."
@@ -81,7 +87,7 @@ check_command "go"
 check_command "git"
 print_success "Dependencies installed successfully"
 
-print_step "3" "Configuring ASB settings"
+print_step "4" "Configuring ASB settings"
 
 # Check if config.json already exists
 if [ -f "config.json" ]; then
@@ -120,7 +126,7 @@ EOF
     print_success "Configuration saved to config.json"
 fi
 
-print_step "4" "Setting up storage directories"
+print_step "5" "Setting up storage directories"
 
 # Read storage directory from config
 if [ -f "config.json" ]; then
@@ -141,7 +147,7 @@ fi
 ln -s "$FULL_STORAGE_PATH" "$HOME/server"
 print_success "Storage setup completed"
 
-print_step "5" "Building ASB application"
+print_step "6" "Building ASB application"
 
 # Initialize Go project if needed
 if [ ! -f "go.mod" ]; then
@@ -165,7 +171,7 @@ else
     exit 1
 fi
 
-print_step "6" "Setting up auto-start service"
+print_step "7" "Setting up auto-start service"
 
 # Setup Termux:Boot auto-start
 BOOT_SCRIPT_DIR="$HOME/.termux/boot"
@@ -208,3 +214,7 @@ echo -e "  3. Restart your device to test auto-start"
 echo -e "  4. Or run manually: ./asb"
 echo
 echo -e "${GREEN}Need help? Check README.md for detailed usage instructions${NC}"
+echo
+echo -e "${YELLOW}🧹 To uninstall ASB later:${NC}"
+echo -e "${YELLOW}  Run: ./uninstall.sh${NC}"
+echo -e "${YELLOW}  This will safely remove all ASB components${NC}"
