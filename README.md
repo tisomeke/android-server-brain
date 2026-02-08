@@ -97,6 +97,21 @@ After setting up Termux:Boot, ASB will start automatically on device boot.
 nohup ./asb > asb.log 2>&1 &
 ```
 
+### 🗑 Uninstallation
+
+To completely remove ASB from your system:
+
+```bash
+./uninstall.sh
+```
+
+The uninstall script will:
+- Stop any running ASB processes
+- Remove the binary and configuration files
+- Clean up auto-start scripts
+- Remove storage directories (optional)
+- Provide confirmation before destructive actions
+
 ### 📖 Usage
 
 #### Telegram Commands:
