@@ -2,8 +2,6 @@ package storage
 
 import (
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"path/filepath"
 
@@ -29,9 +27,8 @@ func SaveTelegramFile(b *tele.Bot, doc *tele.Document, targetDir string) (string
 	}
 	defer out.Close()
 
-	// Construct the download URL
-	// Note: telebot handles the direct download via b.Download
-	err = b.Download(file, fullPath)
+	// Download the file directly using telebot
+	err = b.Download(&file, fullPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to download file: %v", err)
 	}
