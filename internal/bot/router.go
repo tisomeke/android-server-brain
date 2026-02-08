@@ -1,23 +1,28 @@
 package bot
 
 import (
+	"fmt"
+	"android-server-brain/internal/storage"
 	"android-server-brain/internal/system"
+	"android-server-brain/config"
+	
 	tele "gopkg.in/telebot.v3"
 )
 
-// RegisterHandlers maps commands to functions
-func RegisterHandlers(b *tele.Bot) {
-	// Standard command handler
-	b.Handle("/start", func(c tele.Context) error {
-		return c.Send("Welcome to Android Server Brain. Use /status to check system health.")
-	})
+func RegisterHandlers(b *tele.Bot, cfg *config.Config) {
+	// ... previous handlers (/start, /status)
 
-	// System monitoring handler
-	b.Handle("/status", func(c tele.Context) error {
-		status := system.GetSystemStatus()
-		return c.Send(status, tele.ModeMarkdown)
-	})
+	// Handle incoming documents (files)
+	b.Handle(tele.OnDocument, func(c tele.Context) error {
+		doc := c.Message().Document
+		
+		c.Send(fmt.Sprintf("📥 Receiving file: %s...", doc.FileName))
 
-	// Placeholder for future keyboard implementation
-	// b.Handle("/menu", showMenu)
+		filePath, err := storage.SaveTelegramFile(b, doc, cfg.StorageDir)
+		if err != nil {
+			return c.Send(fmt.Sprintf("❌ Error saving file: %v", err))
+		}
+
+		return c.Send(fmt.Sprintf("✅ File saved and made executable:\n`%s` \n\nYou can run it from `~/server/%s`", filePath, doc.FileName), tele.ModeMarkdown)
+	})
 }
