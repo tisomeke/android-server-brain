@@ -61,7 +61,12 @@ confirm_removal
 # Read configuration to get storage directory
 STORAGE_DIR="downloads/server"
 if [ -f "config.json" ]; then
-    STORAGE_DIR=$(grep '"storage_dir"' config.json | cut -d '"' -f 4)
+    # Use jq if available, otherwise fall back to grep
+    if command -v jq &> /dev/null; then
+        STORAGE_DIR=$(jq -r '.storage_dir // "downloads/server"' config.json)
+    else
+        STORAGE_DIR=$(grep '"storage_dir"' config.json | cut -d '"' -f 4)
+    fi
 fi
 FULL_STORAGE_PATH="$HOME/$STORAGE_DIR"
 

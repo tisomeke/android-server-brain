@@ -21,7 +21,20 @@ func LoadConfig() *Config {
 	defer file.Close()
 
 	cfg := &Config{}
-	json.NewDecoder(file).Decode(cfg)
+	if err := json.NewDecoder(file).Decode(cfg); err != nil {
+		log.Fatalf("Failed to parse config.json: %v", err)
+	}
+
+	// Validate required fields
+	if cfg.TelegramToken == "" {
+		log.Fatal("telegram_token is required in config.json")
+	}
+	if cfg.AdminID == 0 {
+		log.Fatal("admin_id is required in config.json")
+	}
+	if cfg.StorageDir == "" {
+		cfg.StorageDir = "downloads/server" // default value
+	}
 
 	setupDirectories(cfg.StorageDir)
 	return cfg
