@@ -43,8 +43,10 @@ func main() {
 	})
 
 	// Setup routes
-	bot.RegisterHandlers(b)
+	bot.RegisterHandlers(b, cfg)
 
 	log.Printf("ASB Started: Admin ID %d", cfg.AdminID)
 	b.Start()
 }
+
+
