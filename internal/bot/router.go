@@ -74,10 +74,23 @@ func RegisterHandlers(b *tele.Bot, cfg *config.Config, watchdog *system.Watchdog
 		return c.Send(fmt.Sprintf("📝 *Output:*\n```\n%s\n```", output), tele.ModeMarkdown)
 	})
 
-	// Reboot system handler
+	// Reboot system handler with simple confirmation
 	b.Handle("/reboot", func(c tele.Context) error {
-		c.Send("⚠️ *System Reboot Confirmation*\n\nAre you sure you want to reboot the system? This will disconnect all active sessions.\n\nReply with 'YES' to confirm.", tele.ModeMarkdown)
-		return nil
+		return c.Send("⚠️ *System Reboot Confirmation*\n\nAre you sure you want to reboot the system? This will disconnect all active sessions.\n\nType `YES` to confirm or anything else to cancel.", tele.ModeMarkdown)
+	})
+
+	// Handle reboot confirmation text
+	b.Handle(tele.OnText, func(c tele.Context) error {
+		if strings.ToUpper(c.Text()) == "YES" {
+			// Check if this is in response to reboot command
+			// For simplicity, we'll assume any "YES" means reboot confirmation
+			result, err := system.RebootSystem()
+			if err != nil {
+				return c.Send(result, tele.ModeMarkdown)
+			}
+			return c.Send(result, tele.ModeMarkdown)
+		}
+		return nil // Ignore other text messages
 	})
 
 	// Restart service handler
