@@ -49,11 +49,8 @@ func (w *Watchdog) Start() {
 
 		log.Printf("Watchdog started with interval: %v", w.interval)
 
-		for {
-			select {
-			case <-ticker.C:
-				w.checkBattery()
-			}
+		for range ticker.C {
+			w.checkBattery()
 		}
 	}()
 }
