@@ -38,7 +38,7 @@ ASB — это легковесный фреймворк на языке Go, о�
 
 Просто запустите установочный скрипт:
 ```bash
-git clone https://github.com/tisomeke/android-server-brain.git
+git clone https://github.com/tisomeke/android-server-brain
 cd android-server-brain
 chmod +x install.sh
 ./install.sh

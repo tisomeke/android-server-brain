@@ -38,7 +38,7 @@ Before installing ASB, ensure you have the following:
 
 Simply run the installation script:
 ```bash
-git clone https://github.com/tisomeke/android-server-brain.git
+git clone https://github.com/tisomeke/android-server-brain
 cd android-server-brain
 chmod +x install.sh
 ./install.sh
