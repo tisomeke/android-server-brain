@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 )
 
@@ -32,7 +31,7 @@ func setupDirectories(storagePath string) {
 	// 1. Creating directory
 	home, _ := os.UserHomeDir()
 	fullStoragePath := filepath.Join(home, storagePath)
-	
+
 	err := os.MkdirAll(fullStoragePath, 0755)
 	if err != nil {
 		log.Printf("Ошибка создания директории: %v", err)
@@ -40,10 +39,10 @@ func setupDirectories(storagePath string) {
 
 	// 2. symlink ~/server -> downloads/server
 	linkPath := filepath.Join(home, "server")
-	
+
 	// checking
 	if _, err := os.Lstat(linkPath); err == nil {
-		os.Remove(linkPath) 
+		os.Remove(linkPath)
 	}
 
 	err = os.Symlink(fullStoragePath, linkPath)
