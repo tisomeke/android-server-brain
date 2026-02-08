@@ -128,6 +128,12 @@ The uninstall script will:
 * `/battery` - Check detailed battery status (charge %, temperature, charging status)
 * `/watchdog` - View watchdog monitoring status and configuration
 
+**System Management:**
+* `/reboot` - Reboot the Android device (requires confirmation)
+* `/restart <service>` - Restart system services
+  - Usage: `/restart ssh` or `/restart nginx`
+  - Use `/restart` without arguments to see available services
+
 **Remote Execution:**
 * `/exec <command>` - Execute shell commands remotely
   - Example: `/exec ps aux` or `/exec df -h`

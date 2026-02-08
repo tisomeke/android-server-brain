@@ -73,4 +73,28 @@ func RegisterHandlers(b *tele.Bot, cfg *config.Config, watchdog *system.Watchdog
 		// Wrap output in code blocks for readability
 		return c.Send(fmt.Sprintf("📝 *Output:*\n```\n%s\n```", output), tele.ModeMarkdown)
 	})
+
+	// Reboot system handler
+	b.Handle("/reboot", func(c tele.Context) error {
+		c.Send("⚠️ *System Reboot Confirmation*\n\nAre you sure you want to reboot the system? This will disconnect all active sessions.\n\nReply with 'YES' to confirm.", tele.ModeMarkdown)
+		return nil
+	})
+
+	// Restart service handler
+	b.Handle("/restart", func(c tele.Context) error {
+		args := c.Args()
+		if len(args) == 0 {
+			return c.Send(system.ListServices(), tele.ModeMarkdown)
+		}
+
+		serviceName := args[0]
+		c.Send(fmt.Sprintf("⏳ Restarting service: `%s`...", serviceName), tele.ModeMarkdown)
+
+		result, err := system.RestartService(serviceName)
+		if err != nil {
+			return c.Send(result, tele.ModeMarkdown)
+		}
+
+		return c.Send(result, tele.ModeMarkdown)
+	})
 }
