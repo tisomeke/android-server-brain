@@ -1,0 +1,5 @@
+{
+  "telegram_token": "YOUR_TELEGRAM_BOT_TOKEN_HERE",
+  "admin_id": 123456789,
+  "storage_dir": "downloads/server"
+}
