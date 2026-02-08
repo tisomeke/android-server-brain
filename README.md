@@ -47,6 +47,8 @@ chmod +x install.sh
 The script will automatically:
 - **Verify system dependencies** (pkg, curl, ping)
 - **Check Termux:Boot status** (requires first-time setup)
+  - Uses enhanced detection with multiple verification methods
+  - Can be bypassed with `SKIP_BOOT_CHECK=1` for advanced users
 - Check and request storage permissions
 - Install required dependencies (golang, git, termux-api)
 - Configure your bot settings interactively

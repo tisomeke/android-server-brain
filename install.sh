@@ -56,14 +56,40 @@ fi
 
 # Check for Termux:Boot installation and first run
 print_warning "Checking Termux:Boot status..."
-if [ ! -d "$HOME/.termux/boot" ]; then
-    print_error "Termux:Boot has never been run!"
-    echo -e "${YELLOW}Please follow these steps:${NC}"
-    echo -e "${YELLOW}1. Install Termux:Boot from F-Droid${NC}"
-    echo -e "${YELLOW}2. Open the Termux:Boot app once${NC}"
-    echo -e "${YELLOW}3. Grant any requested permissions${NC}"
-    echo -e "${YELLOW}4. Run this installer again${NC}"
-    exit 1
+
+# Allow skipping check for advanced users
+if [ -n "$SKIP_BOOT_CHECK" ]; then
+    print_warning "Skipping Termux:Boot verification (SKIP_BOOT_CHECK set)"
+else
+    # More flexible Termux:Boot detection
+    TERMUX_BOOT_INSTALLED=false
+
+    # Check multiple possible locations and conditions
+    if [ -d "$HOME/.termux/boot" ]; then
+        TERMUX_BOOT_INSTALLED=true
+    elif [ -d "/data/data/com.termux/files/home/.termux/boot" ]; then
+        TERMUX_BOOT_INSTALLED=true
+    elif command -v termux-boot-setup &>/dev/null; then
+        TERMUX_BOOT_INSTALLED=true
+    fi
+
+    # Additional check: see if Termux:Boot app has been launched
+    if [ -f "/data/data/com.termux.boot/shared_prefs/com.termux.boot_preferences.xml" ]; then
+        TERMUX_BOOT_INSTALLED=true
+    fi
+
+    if [ "$TERMUX_BOOT_INSTALLED" = false ]; then
+        print_error "Termux:Boot not properly configured!"
+        echo -e "${YELLOW}Please follow these steps:${NC}"
+        echo -e "${YELLOW}1. Install Termux:Boot from F-Droid${NC}"
+        echo -e "${YELLOW}2. Open the Termux:Boot app once${NC}"
+        echo -e "${YELLOW}3. Grant any requested permissions${NC}"
+        echo -e "${YELLOW}4. Run this installer again${NC}"
+        echo
+        echo -e "${YELLOW}Alternative: Skip Termux:Boot check (not recommended)${NC}"
+        echo -e "${YELLOW}Run: SKIP_BOOT_CHECK=1 ./install.sh${NC}"
+        exit 1
+    fi
 fi
 print_success "Termux:Boot verified"
 
