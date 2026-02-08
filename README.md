@@ -45,12 +45,14 @@ chmod +x install.sh
 ```
 
 The script will automatically:
+- **Verify system dependencies** (pkg, curl, ping)
+- **Check Termux:Boot status** (requires first-time setup)
 - Check and request storage permissions
 - Install required dependencies (golang, git, termux-api)
 - Configure your bot settings interactively
 - Set up storage directories and symlinks
 - Build the ASB binary
-- Configure auto-start service
+- Configure **enhanced auto-start service** with network detection
 
 **Option 2: Manual Installation**
 
@@ -90,7 +92,11 @@ The script will automatically:
 ```
 
 **Auto-start:**
-After setting up Termux:Boot, ASB will start automatically on device boot.
+After setting up Termux:Boot, ASB will start automatically on device boot with enhanced reliability:
+- Network connectivity detection
+- Detailed boot logging (`asb-boot.log`)
+- Process monitoring and timeout protection
+- Automatic retry mechanisms
 
 **Background Service:**
 ```bash
@@ -211,7 +217,11 @@ Create `config.json` with the following structure:
 
 **Logs:**
 ```bash
+# Main application log
 tail -f asb.log
+
+# Boot sequence log (for auto-start issues)
+cat asb-boot.log
 ```
 
 ### 🤝 Contributing
