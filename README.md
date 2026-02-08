@@ -171,6 +171,160 @@ The uninstall script will:
 # 3. Run: /exec ~/server/myscript.sh
 ```
 
+### 🎮 Advanced Usage Examples
+
+#### 1. Minecraft Server Deployment
+
+**Setup Process:**
+
+1. **Upload Minecraft server JAR:**
+   - Download desired Minecraft server version (e.g., `paper-1.20.4.jar`)
+   - Send the JAR file to your ASB bot
+   - File will be saved as `~/server/paper-1.20.4.jar`
+
+2. **Initial Configuration:**
+   ```bash
+   # Accept Minecraft EULA
+   /exec echo "eula=true" > ~/server/eula.txt
+   
+   # Create basic server properties
+   /exec echo 'server-port=25565\ngamemode=survival\ndifficulty=normal' > ~/server/server.properties
+   ```
+
+3. **Start the Server:**
+   ```bash
+   # Allocate 2GB RAM to server
+   /exec java -Xmx2G -Xms1G -jar ~/server/paper-1.20.4.jar nogui
+   ```
+
+4. **Server Management:**
+   ```bash
+   # Check server status
+   /exec ps aux | grep java
+   
+   # View server logs
+   /exec tail -f ~/server/logs/latest.log
+   
+   # Stop server gracefully
+   /exec pkill -f "java.*paper"
+   ```
+
+5. **Automated Startup Script:**
+   Create `~/server/start-mc.sh` and upload it:
+   ```bash
+   #!/data/data/com.termux/files/usr/bin/bash
+   cd ~/server
+   java -Xmx2G -Xms1G -jar paper-1.20.4.jar nogui
+   ```
+   Then run: `/exec ~/server/start-mc.sh`
+
+#### 2. Python Bot Hosting
+
+**Deployment Workflow:**
+
+1. **Upload Bot Files:**
+   - Send your Python bot script (e.g., `mybot.py`)
+   - Send `requirements.txt` for dependencies
+   - Send `config.json` for configuration
+
+2. **Environment Setup:**
+   ```bash
+   # Install Python dependencies
+   /exec pip install -r ~/server/requirements.txt
+   
+   # Set up virtual environment (optional)
+   /exec python -m venv ~/server/venv
+   /exec ~/server/venv/bin/pip install -r ~/server/requirements.txt
+   ```
+
+3. **Configuration:**
+   ```bash
+   # Set up bot configuration
+   /exec cat ~/server/config.json
+   
+   # Test bot connectivity
+   /exec python ~/server/mybot.py --test
+   ```
+
+4. **Running the Bot:**
+   ```bash
+   # Direct execution
+   /exec python ~/server/mybot.py
+   
+   # Background execution with logging
+   /exec nohup python ~/server/mybot.py > ~/server/bot.log 2>&1 &
+   
+   # Using virtual environment
+   /exec nohup ~/server/venv/bin/python ~/server/mybot.py > ~/server/bot.log 2>&1 &
+   ```
+
+5. **Bot Lifecycle Management:**
+   ```bash
+   # Check if bot is running
+   /exec ps aux | grep mybot.py
+   
+   # View bot logs
+   /exec tail -f ~/server/bot.log
+   
+   # Restart bot
+   /exec pkill -f mybot.py
+   /exec nohup python ~/server/mybot.py > ~/server/bot.log 2>&1 &
+   
+   # Update bot code
+   # 1. Send updated files to bot
+   # 2. Restart bot process
+   ```
+
+6. **Automated Restart Setup:**
+   Create a restart script `~/server/restart-bot.sh`:
+   ```bash
+   #!/data/data/com.termux/files/usr/bin/bash
+   pkill -f mybot.py
+   sleep 2
+   nohup ~/server/venv/bin/python ~/server/mybot.py > ~/server/bot.log 2>&1 &
+   echo "Bot restarted at $(date)"
+   ```
+   Make it executable: `/exec chmod +x ~/server/restart-bot.sh`
+   Use it: `/exec ~/server/restart-bot.sh`
+
+#### 3. System Administration Tasks
+
+**Storage Management:**
+```bash
+# Check disk usage
+/exec df -h
+
+# Clean up old logs
+/exec find ~/server/logs -name "*.log" -mtime +7 -delete
+
+# Backup important files
+/exec tar -czf ~/server-backup-$(date +%Y%m%d).tar.gz ~/server/
+```
+
+**Process Monitoring:**
+```bash
+# Monitor resource usage
+/exec top -n 1
+
+# Check specific processes
+/exec pgrep -f "java\|python"
+
+# Kill hanging processes
+/exec pkill -f "process_name"
+```
+
+**Network Operations:**
+```bash
+# Check network connectivity
+/exec ping -c 4 google.com
+
+# View active connections
+/exec netstat -tuln
+
+# Port monitoring
+/exec ss -tuln | grep :25565  # Minecraft port
+```
+
 ### 🏗 Project Structure
 
 ```
