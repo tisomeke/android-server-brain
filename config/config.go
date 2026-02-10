@@ -41,25 +41,39 @@ func LoadConfig() *Config {
 }
 
 func setupDirectories(storagePath string) {
-	// 1. Creating directory
 	home, _ := os.UserHomeDir()
-	fullStoragePath := filepath.Join(home, storagePath)
-
-	err := os.MkdirAll(fullStoragePath, 0755)
+	
+	// New storage structure:
+	// 1. Use Android's system Downloads folder via termux-storage-create
+	// 2. Create asb_files directory in Downloads
+	// 3. Create symlink ~/asb_files -> /storage/emulated/0/Download/asb_files
+	
+	// Path to Android's system Downloads folder
+	systemDownloadsPath := "/storage/emulated/0/Download"
+	asbFilesDir := filepath.Join(systemDownloadsPath, "asb_files")
+	
+	// Create asb_files directory in system Downloads
+	err := os.MkdirAll(asbFilesDir, 0755)
 	if err != nil {
-		log.Printf("Ошибка создания директории: %v", err)
+		log.Printf("Error creating asb_files in Downloads: %v", err)
+		log.Printf("Falling back to home directory storage")
+		// Fallback to home directory if system Downloads not accessible
+		asbFilesDir = filepath.Join(home, "asb_files")
+		os.MkdirAll(asbFilesDir, 0755)
 	}
 
-	// 2. symlink ~/server -> downloads/server
-	linkPath := filepath.Join(home, "server")
+	// Create symlink ~/asb_files -> asbFilesDir
+	linkPath := filepath.Join(home, "asb_files")
 
-	// checking
+	// Remove existing symlink if present
 	if _, err := os.Lstat(linkPath); err == nil {
 		os.Remove(linkPath)
 	}
 
-	err = os.Symlink(fullStoragePath, linkPath)
+	err = os.Symlink(asbFilesDir, linkPath)
 	if err != nil {
 		log.Printf("Couldn't create symlink: %v", err)
 	}
+	
+	log.Printf("Storage setup: %s -> %s", linkPath, asbFilesDir)
 }

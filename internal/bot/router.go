@@ -32,7 +32,7 @@ func RegisterHandlers(b *tele.Bot, cfg *config.Config, watchdog *system.Watchdog
 			return c.Send(fmt.Sprintf("❌ Error saving file: %v", err))
 		}
 
-		return c.Send(fmt.Sprintf("✅ File saved and made executable:\n`%s` \n\nYou can run it from `~/server/%s`", filePath, doc.FileName), tele.ModeMarkdown)
+		return c.Send(fmt.Sprintf("✅ File saved and made executable:\n`%s` \n\nYou can run it from `~/asb_files/%s`\n\nLocation: /storage/emulated/0/Download/asb_files/", filePath, doc.FileName), tele.ModeMarkdown)
 	})
 
 	// Battery status handler

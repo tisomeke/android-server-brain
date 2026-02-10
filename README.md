@@ -163,17 +163,18 @@ The uninstall script will:
 
 **File Management:**
 * **Upload files** - Simply send any file to the bot
-  - Files are automatically saved to `~/downloads/server`
-  - Symlinked to `~/server` with executable permissions (`chmod +x`)
-  - Access via `~/server/filename` or direct path
+  - Files are automatically saved to Android's Downloads folder: `/storage/emulated/0/Download/asb_files/`
+  - Symlinked to `~/asb_files` for easy access
+  - Files get executable permissions (`chmod +x`)
+  - Access via `~/asb_files/filename` or directly from Downloads
   - Can be executed directly after upload
 
 #### File Management:
 
 * **Upload files** - Send any file to the bot
-* Files are saved to `~/downloads/server`
-* Automatically symlinked to `~/server` with executable permissions
-* Access via `~/server/filename` or direct path
+* Files are saved to Android's Downloads: `/storage/emulated/0/Download/asb_files/`
+* Automatically symlinked to `~/asb_files` with executable permissions
+* Access via `~/asb_files/filename` or from Downloads app
 
 #### Example Workflows:
 

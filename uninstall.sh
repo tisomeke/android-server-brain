@@ -127,28 +127,48 @@ if [ -f "go.sum" ]; then
 fi
 
 print_step "4" "Cleaning up storage"
-# Remove symlink
+# Remove old symlink (backward compatibility)
 if [ -L "$HOME/server" ]; then
     rm "$HOME/server"
-    print_success "Removed symlink: ~/server"
-elif [ -e "$HOME/server" ]; then
-    print_warning "~/server exists but is not a symlink"
+    print_success "Removed old symlink: ~/server"
+fi
+
+# Remove new symlink
+if [ -L "$HOME/asb_files" ]; then
+    rm "$HOME/asb_files"
+    print_success "Removed symlink: ~/asb_files"
+elif [ -e "$HOME/asb_files" ]; then
+    print_warning "~/asb_files exists but is not a symlink"
 fi
 
 # Ask about storage directory removal
+SYSTEM_DOWNLOADS="/storage/emulated/0/Download"
+ASB_FILES_DIR="$SYSTEM_DOWNLOADS/asb_files"
+
 echo
-echo -e "${YELLOW}Storage directory: $FULL_STORAGE_PATH${NC}"
-read -p "Remove uploaded files and scripts? (y/N): " -n 1 -r
+echo -e "${YELLOW}Storage locations:${NC}"
+echo -e "  System Downloads: $ASB_FILES_DIR"
+echo -e "  Home directory: $HOME/asb_files"
+read -p "Remove all uploaded files and scripts? (y/N): " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
+    # Remove from system Downloads
+    if [ -d "$ASB_FILES_DIR" ]; then
+        rm -rf "$ASB_FILES_DIR"
+        print_success "Removed from system Downloads"
+    fi
+    # Remove from home directory (fallback)
+    if [ -d "$HOME/asb_files" ] && [ ! -L "$HOME/asb_files" ]; then
+        rm -rf "$HOME/asb_files"
+        print_success "Removed from home directory"
+    fi
+    # Remove old location (backward compatibility)
     if [ -d "$FULL_STORAGE_PATH" ]; then
         rm -rf "$FULL_STORAGE_PATH"
-        print_success "Removed storage directory"
-    else
-        print_warning "Storage directory not found"
+        print_success "Removed old storage directory"
     fi
 else
-    print_warning "Storage directory preserved"
+    print_warning "Storage directories preserved"
 fi
 
 print_step "5" "Removing installation directory"

@@ -174,24 +174,42 @@ fi
 
 print_step "5" "Setting up storage directories"
 
-# Read storage directory from config
-if [ -f "config.json" ]; then
-    STORAGE_DIR=$(grep '"storage_dir"' config.json | cut -d '"' -f 4)
-fi
-STORAGE_DIR=${STORAGE_DIR:-downloads/server}
-FULL_STORAGE_PATH="$HOME/$STORAGE_DIR"
+# New storage structure: use Android's system Downloads folder
+print_warning "Setting up storage in Android Downloads..."
 
-# Create storage directory
-print_warning "Creating directory: $FULL_STORAGE_PATH"
-mkdir -p "$FULL_STORAGE_PATH"
-
-# Create symlink
-print_warning "Creating symlink ~/server -> $STORAGE_DIR"
-if [ -L "$HOME/server" ] || [ -e "$HOME/server" ]; then
-    rm -f "$HOME/server"
+# Ensure termux-storage-create has been run
+if [ ! -d "$HOME/storage" ]; then
+    print_warning "Requesting storage access... Please click 'Allow' on the popup."
+    termux-setup-storage
+    sleep 5
+    if [ ! -d "$HOME/storage" ]; then
+        print_error "Storage access not granted. Please run 'termux-setup-storage' manually and try again."
+        exit 1
+    fi
 fi
-ln -s "$FULL_STORAGE_PATH" "$HOME/server"
-print_success "Storage setup completed"
+
+# Create asb_files directory in system Downloads
+SYSTEM_DOWNLOADS="/storage/emulated/0/Download"
+ASB_FILES_DIR="$SYSTEM_DOWNLOADS/asb_files"
+
+if [ -d "$SYSTEM_DOWNLOADS" ]; then
+    print_warning "Creating asb_files in Downloads..."
+    mkdir -p "$ASB_FILES_DIR"
+    
+    # Create symlink ~/asb_files -> /storage/emulated/0/Download/asb_files
+    print_warning "Creating symlink ~/asb_files -> Downloads/asb_files"
+    if [ -L "$HOME/asb_files" ] || [ -e "$HOME/asb_files" ]; then
+        rm -f "$HOME/asb_files"
+    fi
+    ln -s "$ASB_FILES_DIR" "$HOME/asb_files"
+    print_success "Storage setup completed"
+    print_success "Files will be saved to: $ASB_FILES_DIR"
+else
+    print_error "Cannot access system Downloads folder"
+    print_warning "Falling back to home directory storage"
+    mkdir -p "$HOME/asb_files"
+    print_success "Fallback storage created at ~/asb_files"
+fi
 
 print_step "6" "Building ASB application"
 
@@ -271,7 +289,7 @@ echo
 echo -e "${CYAN}Summary:${NC}"
 echo -e "  • Binary: $(pwd)/asb"
 echo -e "  • Config: $(pwd)/config.json"
-echo -e "  • Storage: ~/server -> $STORAGE_DIR"
+echo -e "  • Storage: ~/asb_files -> /storage/emulated/0/Download/asb_files/"
 echo -e "  • Main Log: $(pwd)/asb.log"
 echo -e "  • Boot Log: $(pwd)/asb-boot.log"
 echo -e "  • Auto-start: $BOOT_SCRIPT"

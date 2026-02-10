@@ -8,7 +8,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
-// SaveTelegramFile downloads a file from Telegram and saves it to the target directory
+// SaveTelegramFile downloads a file from Telegram and saves it to the asb_files directory
 func SaveTelegramFile(b *tele.Bot, doc *tele.Document, targetDir string) (string, error) {
 	// Get the file path from Telegram servers
 	file, err := b.FileByID(doc.FileID)
@@ -16,9 +16,17 @@ func SaveTelegramFile(b *tele.Bot, doc *tele.Document, targetDir string) (string
 		return "", fmt.Errorf("failed to get file by ID: %v", err)
 	}
 
-	// Prepare the full destination path
+	// Prepare the full destination path in ~/asb_files (symlinked to /storage/emulated/0/Download/asb_files)
 	home, _ := os.UserHomeDir()
-	fullPath := filepath.Join(home, targetDir, doc.FileName)
+	asbFilesDir := filepath.Join(home, "asb_files")
+	
+	// Ensure the directory exists
+	err = os.MkdirAll(asbFilesDir, 0755)
+	if err != nil {
+		return "", fmt.Errorf("failed to create asb_files directory: %v", err)
+	}
+	
+	fullPath := filepath.Join(asbFilesDir, doc.FileName)
 
 	// Create the file on disk
 	out, err := os.Create(fullPath)
