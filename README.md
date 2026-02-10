@@ -30,7 +30,7 @@ ASB is a lightweight Go-based framework designed to run inside **Termux**. It tr
 
 * **System Monitoring:** Real-time stats (Battery, CPU, Storage, Uptime) via `termux-api`.
 * **Remote Shell:** Execute Bash commands directly from Telegram with timeout protection.
-* **Smart Storage:** Upload scripts/files via Telegram; they are saved to `~/downloads/server` and automatically linked to `~/server` with `+x` permissions.
+* **Smart Storage:** Upload scripts/files via Telegram; they are saved to Android's Downloads folder (`/storage/emulated/0/Download/asb_files/`) and automatically linked to `~/asb_files` with `+x` permissions.
 * **Mesh Networking:** Integrated Tailscale support for secure remote access without public IPs.
 * **Admin Security:** Strict ID-based white-listing.
 
@@ -190,7 +190,7 @@ The uninstall script will:
 # Upload and run scripts
 # 1. Send script file to bot
 # 2. Script automatically becomes executable
-# 3. Run: /exec ~/server/myscript.sh
+# 3. Run: /exec ~/asb_files/myscript.sh
 
 # Check for and install updates
 /update
@@ -206,21 +206,21 @@ The uninstall script will:
 1. **Upload Minecraft server JAR:**
    - Download desired Minecraft server version (e.g., `paper-1.20.4.jar`)
    - Send the JAR file to your ASB bot
-   - File will be saved as `~/server/paper-1.20.4.jar`
+   - File will be saved as `~/asb_files/paper-1.20.4.jar`
 
 2. **Initial Configuration:**
    ```bash
    # Accept Minecraft EULA
-   /exec echo "eula=true" > ~/server/eula.txt
+   /exec echo "eula=true" > ~/asb_files/eula.txt
    
    # Create basic server properties
-   /exec echo 'server-port=25565\ngamemode=survival\ndifficulty=normal' > ~/server/server.properties
+   /exec echo 'server-port=25565\ngamemode=survival\ndifficulty=normal' > ~/asb_files/server.properties
    ```
 
 3. **Start the Server:**
    ```bash
    # Allocate 2GB RAM to server
-   /exec java -Xmx2G -Xms1G -jar ~/server/paper-1.20.4.jar nogui
+   /exec java -Xmx2G -Xms1G -jar ~/asb_files/paper-1.20.4.jar nogui
    ```
 
 4. **Server Management:**
@@ -229,20 +229,20 @@ The uninstall script will:
    /exec ps aux | grep java
    
    # View server logs
-   /exec tail -f ~/server/logs/latest.log
+   /exec tail -f ~/asb_files/logs/latest.log
    
    # Stop server gracefully
    /exec pkill -f "java.*paper"
    ```
 
 5. **Automated Startup Script:**
-   Create `~/server/start-mc.sh` and upload it:
+   Create `~/asb_files/start-mc.sh` and upload it:
    ```bash
    #!/data/data/com.termux/files/usr/bin/bash
-   cd ~/server
+   cd ~/asb_files
    java -Xmx2G -Xms1G -jar paper-1.20.4.jar nogui
    ```
-   Then run: `/exec ~/server/start-mc.sh`
+   Then run: `/exec ~/asb_files/start-mc.sh`
 
 #### 2. Python Bot Hosting
 
@@ -256,32 +256,32 @@ The uninstall script will:
 2. **Environment Setup:**
    ```bash
    # Install Python dependencies
-   /exec pip install -r ~/server/requirements.txt
+   /exec pip install -r ~/asb_files/requirements.txt
    
    # Set up virtual environment (optional)
-   /exec python -m venv ~/server/venv
-   /exec ~/server/venv/bin/pip install -r ~/server/requirements.txt
+   /exec python -m venv ~/asb_files/venv
+   /exec ~/asb_files/venv/bin/pip install -r ~/asb_files/requirements.txt
    ```
 
 3. **Configuration:**
    ```bash
    # Set up bot configuration
-   /exec cat ~/server/config.json
+   /exec cat ~/asb_files/config.json
    
    # Test bot connectivity
-   /exec python ~/server/mybot.py --test
+   /exec python ~/asb_files/mybot.py --test
    ```
 
 4. **Running the Bot:**
    ```bash
    # Direct execution
-   /exec python ~/server/mybot.py
+   /exec python ~/asb_files/mybot.py
    
    # Background execution with logging
-   /exec nohup python ~/server/mybot.py > ~/server/bot.log 2>&1 &
+   /exec nohup python ~/asb_files/mybot.py > ~/asb_files/bot.log 2>&1 &
    
    # Using virtual environment
-   /exec nohup ~/server/venv/bin/python ~/server/mybot.py > ~/server/bot.log 2>&1 &
+   /exec nohup ~/asb_files/venv/bin/python ~/asb_files/mybot.py > ~/asb_files/bot.log 2>&1 &
    ```
 
 5. **Bot Lifecycle Management:**
@@ -290,11 +290,11 @@ The uninstall script will:
    /exec ps aux | grep mybot.py
    
    # View bot logs
-   /exec tail -f ~/server/bot.log
+   /exec tail -f ~/asb_files/bot.log
    
    # Restart bot
    /exec pkill -f mybot.py
-   /exec nohup python ~/server/mybot.py > ~/server/bot.log 2>&1 &
+   /exec nohup python ~/asb_files/mybot.py > ~/asb_files/bot.log 2>&1 &
    
    # Update bot code
    # 1. Send updated files to bot
@@ -302,16 +302,16 @@ The uninstall script will:
    ```
 
 6. **Automated Restart Setup:**
-   Create a restart script `~/server/restart-bot.sh`:
+   Create a restart script `~/asb_files/restart-bot.sh`:
    ```bash
    #!/data/data/com.termux/files/usr/bin/bash
    pkill -f mybot.py
    sleep 2
-   nohup ~/server/venv/bin/python ~/server/mybot.py > ~/server/bot.log 2>&1 &
+   nohup ~/asb_files/venv/bin/python ~/asb_files/mybot.py > ~/asb_files/bot.log 2>&1 &
    echo "Bot restarted at $(date)"
    ```
-   Make it executable: `/exec chmod +x ~/server/restart-bot.sh`
-   Use it: `/exec ~/server/restart-bot.sh`
+   Make it executable: `/exec chmod +x ~/asb_files/restart-bot.sh`
+   Use it: `/exec ~/asb_files/restart-bot.sh`
 
 #### 3. System Administration Tasks
 
@@ -321,10 +321,10 @@ The uninstall script will:
 /exec df -h
 
 # Clean up old logs
-/exec find ~/server/logs -name "*.log" -mtime +7 -delete
+/exec find ~/asb_files/logs -name "*.log" -mtime +7 -delete
 
 # Backup important files
-/exec tar -czf ~/server-backup-$(date +%Y%m%d).tar.gz ~/server/
+/exec tar -czf ~/asb_files-backup-$(date +%Y%m%d).tar.gz ~/asb_files/
 ```
 
 **Process Monitoring:**

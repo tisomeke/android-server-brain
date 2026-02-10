@@ -42,16 +42,16 @@ func LoadConfig() *Config {
 
 func setupDirectories(storagePath string) {
 	home, _ := os.UserHomeDir()
-	
+
 	// New storage structure:
 	// 1. Use Android's system Downloads folder via termux-storage-create
 	// 2. Create asb_files directory in Downloads
 	// 3. Create symlink ~/asb_files -> /storage/emulated/0/Download/asb_files
-	
+
 	// Path to Android's system Downloads folder
 	systemDownloadsPath := "/storage/emulated/0/Download"
 	asbFilesDir := filepath.Join(systemDownloadsPath, "asb_files")
-	
+
 	// Create asb_files directory in system Downloads
 	err := os.MkdirAll(asbFilesDir, 0755)
 	if err != nil {
@@ -74,6 +74,6 @@ func setupDirectories(storagePath string) {
 	if err != nil {
 		log.Printf("Couldn't create symlink: %v", err)
 	}
-	
+
 	log.Printf("Storage setup: %s -> %s", linkPath, asbFilesDir)
 }

@@ -30,7 +30,7 @@ ASB — это легковесный фреймворк на языке Go, о�
 
 * **Мониторинг системы:** Получение данных о заряде батареи, свободном месте и аптайме через `termux-api`.
 * **Удаленный Shell:** Выполнение любых Bash-команд прямо из чата с защитой от зависания (тайм-аут 30 сек).
-* **Менеджер файлов:** Прием файлов через Telegram, сохранение в `~/downloads/server` и автоматическое создание симлинка в `~/server` с правами на исполнение (`chmod +x`).
+* **Менеджер файлов:** Прием файлов через Telegram, сохранение в папку Downloads Android (`/storage/emulated/0/Download/asb_files/`) и автоматическое создание симлинка в `~/asb_files` с правами на исполнение (`chmod +x`).
 * **Безопасная сеть:** Поддержка Tailscale для доступа к серверу без "белого" IP.
 * **Безопасность:** Доступ разрешен только для AdminID, указанного в конфиге.
 
@@ -190,7 +190,7 @@ nohup ./asb > asb.log 2>&1 &
 # Загрузка и запуск скриптов
 # 1. Отправьте файл скрипта боту
 # 2. Скрипт автоматически становится исполняемым
-# 3. Запустите: /exec ~/server/myscript.sh
+# 3. Запустите: /exec ~/asb_files/myscript.sh
 
 # Проверка и установка обновлений
 /update
@@ -206,21 +206,21 @@ nohup ./asb > asb.log 2>&1 &
 1. **Загрузка JAR-файла Minecraft:**
    - Скачайте нужную версию Minecraft-сервера (например, `paper-1.20.4.jar`)
    - Отправьте JAR-файл своему ASB-боту
-   - Файл будет сохранен как `~/server/paper-1.20.4.jar`
+   - Файл будет сохранен как `~/asb_files/paper-1.20.4.jar`
 
 2. **Первоначальная настройка:**
    ```bash
    # Принятие лицензионного соглашения Minecraft
-   /exec echo "eula=true" > ~/server/eula.txt
+   /exec echo "eula=true" > ~/asb_files/eula.txt
    
    # Создание базовых свойств сервера
-   /exec echo 'server-port=25565\ngamemode=survival\ndifficulty=normal' > ~/server/server.properties
+   /exec echo 'server-port=25565\ngamemode=survival\ndifficulty=normal' > ~/asb_files/server.properties
    ```
 
 3. **Запуск сервера:**
    ```bash
    # Выделение 2 ГБ оперативной памяти серверу
-   /exec java -Xmx2G -Xms1G -jar ~/server/paper-1.20.4.jar nogui
+   /exec java -Xmx2G -Xms1G -jar ~/asb_files/paper-1.20.4.jar nogui
    ```
 
 4. **Управление сервером:**
@@ -229,20 +229,20 @@ nohup ./asb > asb.log 2>&1 &
    /exec ps aux | grep java
    
    # Просмотр логов сервера
-   /exec tail -f ~/server/logs/latest.log
+   /exec tail -f ~/asb_files/logs/latest.log
    
    # Корректная остановка сервера
    /exec pkill -f "java.*paper"
    ```
 
 5. **Скрипт автоматического запуска:**
-   Создайте `~/server/start-mc.sh` и загрузите его:
+   Создайте `~/asb_files/start-mc.sh` и загрузите его:
    ```bash
    #!/data/data/com.termux/files/usr/bin/bash
-   cd ~/server
+   cd ~/asb_files
    java -Xmx2G -Xms1G -jar paper-1.20.4.jar nogui
    ```
-   Затем выполните: `/exec ~/server/start-mc.sh`
+   Затем выполните: `/exec ~/asb_files/start-mc.sh`
 
 #### 2. Хостинг Python-бота
 
@@ -256,32 +256,32 @@ nohup ./asb > asb.log 2>&1 &
 2. **Настройка окружения:**
    ```bash
    # Установка зависимостей Python
-   /exec pip install -r ~/server/requirements.txt
+   /exec pip install -r ~/asb_files/requirements.txt
    
    # Настройка виртуального окружения (опционально)
-   /exec python -m venv ~/server/venv
-   /exec ~/server/venv/bin/pip install -r ~/server/requirements.txt
+   /exec python -m venv ~/asb_files/venv
+   /exec ~/asb_files/venv/bin/pip install -r ~/asb_files/requirements.txt
    ```
 
 3. **Конфигурация:**
    ```bash
    # Настройка конфигурации бота
-   /exec cat ~/server/config.json
+   /exec cat ~/asb_files/config.json
    
    # Тестирование подключения бота
-   /exec python ~/server/mybot.py --test
+   /exec python ~/asb_files/mybot.py --test
    ```
 
 4. **Запуск бота:**
    ```bash
    # Прямое выполнение
-   /exec python ~/server/mybot.py
+   /exec python ~/asb_files/mybot.py
    
    # Фоновое выполнение с логированием
-   /exec nohup python ~/server/mybot.py > ~/server/bot.log 2>&1 &
+   /exec nohup python ~/asb_files/mybot.py > ~/asb_files/bot.log 2>&1 &
    
    # Использование виртуального окружения
-   /exec nohup ~/server/venv/bin/python ~/server/mybot.py > ~/server/bot.log 2>&1 &
+   /exec nohup ~/asb_files/venv/bin/python ~/asb_files/mybot.py > ~/asb_files/bot.log 2>&1 &
    ```
 
 5. **Управление жизненным циклом бота:**
@@ -290,11 +290,11 @@ nohup ./asb > asb.log 2>&1 &
    /exec ps aux | grep mybot.py
    
    # Просмотр логов бота
-   /exec tail -f ~/server/bot.log
+   /exec tail -f ~/asb_files/bot.log
    
    # Перезапуск бота
    /exec pkill -f mybot.py
-   /exec nohup python ~/server/mybot.py > ~/server/bot.log 2>&1 &
+   /exec nohup python ~/asb_files/mybot.py > ~/asb_files/bot.log 2>&1 &
    
    # Обновление кода бота
    # 1. Отправьте обновленные файлы боту
@@ -302,16 +302,16 @@ nohup ./asb > asb.log 2>&1 &
    ```
 
 6. **Настройка автоматического перезапуска:**
-   Создайте скрипт перезапуска `~/server/restart-bot.sh`:
+   Создайте скрипт перезапуска `~/asb_files/restart-bot.sh`:
    ```bash
    #!/data/data/com.termux/files/usr/bin/bash
    pkill -f mybot.py
    sleep 2
-   nohup ~/server/venv/bin/python ~/server/mybot.py > ~/server/bot.log 2>&1 &
+   nohup ~/asb_files/venv/bin/python ~/asb_files/mybot.py > ~/asb_files/bot.log 2>&1 &
    echo "Бот перезапущен в $(date)"
    ```
-   Сделайте его исполняемым: `/exec chmod +x ~/server/restart-bot.sh`
-   Используйте его: `/exec ~/server/restart-bot.sh`
+   Сделайте его исполняемым: `/exec chmod +x ~/asb_files/restart-bot.sh`
+   Используйте его: `/exec ~/asb_files/restart-bot.sh`
 
 #### 3. Задачи системного администрирования
 
@@ -321,10 +321,10 @@ nohup ./asb > asb.log 2>&1 &
 /exec df -h
 
 # Очистка старых логов
-/exec find ~/server/logs -name "*.log" -mtime +7 -delete
+/exec find ~/asb_files/logs -name "*.log" -mtime +7 -delete
 
 # Резервное копирование важных файлов
-/exec tar -czf ~/server-backup-$(date +%Y%m%d).tar.gz ~/server/
+/exec tar -czf ~/asb_files-backup-$(date +%Y%m%d).tar.gz ~/asb_files/
 ```
 
 **Мониторинг процессов:**
