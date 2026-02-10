@@ -3,13 +3,21 @@
 **Turn your Android smartphone into a powerful, Telegram-managed autonomous server.**
 
 > [!WARNING]
-> **Known Issues Requiring Attention:**
+> **Project Status: ARCHIVED - Pending Docker Implementation**
+> 
+> This project is currently archived due to environment-specific issues that require a different approach:
 > - Go 1.25.7 toolchain problems on Android/arm64 (use Go 1.21.x instead)
 > - DNS resolution issues in Termux environment
 > - Binary execution problems on some Android devices
 > - Termux:Boot detection sensitivity
 > 
-> These issues are being actively worked on. See workaround solutions in documentation.
+> **Recommended Solution:** Docker containerization is needed for stable cross-device compatibility. This would provide:
+> - Consistent runtime environment across all Android devices
+> - Isolated dependencies and networking
+> - Easier deployment and updates
+> - Better reliability and maintainability
+> 
+> The project will be revived once Docker implementation is complete.
 
 > [!TIP]
 > [🇷🇺 *Читать на русском*](README.ru.md)
